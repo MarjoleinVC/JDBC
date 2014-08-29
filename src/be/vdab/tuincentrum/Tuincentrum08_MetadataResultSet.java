@@ -8,29 +8,30 @@ package be.vdab.tuincentrum;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
  *
- * @author marjolein.vancelst
+ * @author marjolein
  */
-public class Tuincentrum4_Lezen3 {
+public class Tuincentrum08_MetadataResultSet {
 
     private static final String URL = "jdbc:mysql://localhost/tuincentrum";
     private static final String USER = "cursist";
     private static final String PASSWORD = "cursist";
-    private static final String SELECT_SQL
-            = "select naam,aantalkinderen from leveranciers order by naam";
+    private static final String SQL_SELECT
+            = "select id, voornaam, indienst from werknemers";
 
     public static void main(String[] args) {
         try (Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(SELECT_SQL)) {
-            while (resultSet.next()) {
-                System.out.print(resultSet.getString("naam") + ' ');
-                int aantalKinderen = resultSet.getInt("aantalkinderen");
-                System.out.println(resultSet.wasNull() ? "onbekend" : aantalKinderen);
+                Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(SQL_SELECT)) {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                for (int index = 1; index <= metaData.getColumnCount(); index++) {
+                    System.out.println(metaData.getColumnName(index) + " " + metaData.getColumnTypeName(index));
+                }
             }
         } catch (SQLException ex) {
             System.out.println(ex);
